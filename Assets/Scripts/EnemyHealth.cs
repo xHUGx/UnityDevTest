@@ -8,7 +8,7 @@ public class EnemyHealth : MonoBehaviour
 {
     public float health;
     public float maxHealth;
-
+    public static int killed = 0;
     public Slider slider;
 
     private void Start()
@@ -20,10 +20,11 @@ public class EnemyHealth : MonoBehaviour
     private void Update()
     {
         slider.value = CalculateHealth();
-
+        Debug.Log(killed);
         if (health <= 0)
         {
             Destroy(gameObject);
+            killed++;
         }
 
         if (health > maxHealth)

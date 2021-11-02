@@ -6,12 +6,12 @@ using UnityEngine;
 public class BulletsPooler : MonoBehaviour
 {
     public static BulletsPooler SharedInstance;
-    public List<GameObject> pooledObjects;
+    public List<GameObject> pooledObjects = new List<GameObject>();
     public GameObject objectToPool;
-    public GameObject pistolMuzzle;
+    
     
 
-    public int amountToPool;
+    public int amountToPool = 20;
   
     void Awake()
     {
@@ -20,13 +20,12 @@ public class BulletsPooler : MonoBehaviour
 
     private void Start()
     {
-        pooledObjects = new List<GameObject>();
         for (int i = 0; i < amountToPool; i++)
         {
-            GameObject obj = Instantiate(objectToPool,pistolMuzzle.transform.position , pistolMuzzle.transform.rotation);
+            GameObject obj = Instantiate(objectToPool);
             obj.SetActive(false);
             pooledObjects.Add(obj);
-            obj.transform.SetParent(pistolMuzzle.transform);
+            obj.transform.SetParent(gameObject.transform);
         }
     }
 

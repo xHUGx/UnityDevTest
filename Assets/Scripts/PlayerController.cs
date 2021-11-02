@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Vector3 = UnityEngine.Vector3;
 
 public class PlayerController : MonoBehaviour
@@ -11,14 +13,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera mainCamera;
     public GameObject[] waypoints;
     public GameObject projectilePrefab;
+    public GameObject pistolMuzzle;
     private Rigidbody bulletRb;
     private Animator anim;
    
-    private int current = 0;
+    private int current = 1;
     private float WPradius = 1;
     public float speed;
     private int stage = 1;
-    private int killed = 0;
+    private int killed;
+    [SerializeField] private TextMeshProUGUI moveText;
     
 
     private void Start()
@@ -28,8 +32,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        switch (stage)
+       switch (stage)
         {
+            case 0:
+                NextStage();
+                break;
             case 1:
                 Moving(3);
                 break;
@@ -78,42 +85,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void Shooting(int TargetKils)
+    public void Shooting(int targetKills)
     {
         anim.SetFloat("Speed",0.5f);
-        if (Input.GetButtonDown("Fire1"))
+        GameObject pooledProjectile = BulletsPooler.SharedInstance.GetPooledObject();
+        Rigidbody bulletRb = pooledProjectile.GetComponent<Rigidbody>();
+        if (Input.GetButtonDown("Fire1") && (EnemyHealth.killed<targetKills))
         {
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            
-            RaycastHit hitInfo;
-
-            GameObject pooledProjectile = BulletsPooler.SharedInstance.GetPooledObject();
-            Rigidbody bulletRb = pooledProjectile.GetComponent<Rigidbody>();
             if (pooledProjectile != null)
             {
+                pooledProjectile.transform.position = pistolMuzzle.transform.position;
                 pooledProjectile.SetActive(true);
-                Debug.Log(ray);
-                if (Physics.Raycast(ray, out hitInfo))
-                {
-                    Debug.Log(hitInfo.transform.name);
-                    if (hitInfo.transform.CompareTag("Enemy"))
-                    {
-                        hitInfo.collider.GetComponent<EnemyHealth>().TakeDamage(50);
-                        if (hitInfo.collider.GetComponent<EnemyHealth>().health == 0)
-                        {
-                            killed++;
-                        }
-                        if (killed == TargetKils)
-                        {
-                            stage++;
-                        }
-                    }
-                    bulletRb.AddForce(ray.direction * 30f , ForceMode.Impulse);
-                }
+                bulletRb.AddForce(ray.direction * 400f , ForceMode.Acceleration);
             }
         }
-
+        if (EnemyHealth.killed == targetKills)
+        {
+            NextStage();
+        }
     }
-    
-    
+
+    void NextStage()
+    {
+        moveText.gameObject.SetActive(true);
+        if (Input.GetButton("Fire1"))
+        {
+            stage++;
+            moveText.gameObject.SetActive(false);
+        }
+    }
 }
