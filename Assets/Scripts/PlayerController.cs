@@ -11,22 +11,22 @@ using Vector3 = UnityEngine.Vector3;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
-    public GameObject[] waypoints;
-    public GameObject projectilePrefab;
-    public GameObject pistolMuzzle;
+    [SerializeField] private GameObject[] waypoints;
+    [SerializeField] public GameObject pistolMuzzle;
     private Rigidbody bulletRb;
     private Animator anim;
    
-    private int current = 1;
+    private int current;
     private float WPradius = 1;
     public float speed;
-    private int stage = 1;
-    private int killed;
+    private int stage;
     [SerializeField] private TextMeshProUGUI moveText;
     
 
     private void Start()
     {
+        current = 1;
+        stage = 1;
         anim = GetComponentInChildren<Animator>();
     }
 
@@ -90,6 +90,7 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("Speed",0.5f);
         GameObject pooledProjectile = BulletsPooler.SharedInstance.GetPooledObject();
         Rigidbody bulletRb = pooledProjectile.GetComponent<Rigidbody>();
+       
         if (Input.GetButtonDown("Fire1") && (EnemyHealth.killed<targetKills))
         {
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
