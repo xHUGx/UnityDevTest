@@ -6,11 +6,8 @@ using UnityEngine;
 public class BulletsPooler : MonoBehaviour
 {
     public static BulletsPooler SharedInstance;
-    public List<GameObject> pooledObjects = new List<GameObject>();
-    public GameObject objectToPool;
-    
-    
-
+    private Bullet[] _pooledObjects;
+    public Bullet objectToPool;
     public int amountToPool = 20;
   
     void Awake()
@@ -20,22 +17,22 @@ public class BulletsPooler : MonoBehaviour
 
     private void Start()
     {
+        _pooledObjects = new Bullet[amountToPool];
         for (int i = 0; i < amountToPool; i++)
         {
-            GameObject obj = Instantiate(objectToPool);
-            obj.SetActive(false);
-            pooledObjects.Add(obj);
-            obj.transform.SetParent(gameObject.transform);
+            var bullet = Instantiate(objectToPool,transform);
+            bullet.gameObject.SetActive(false);
+            _pooledObjects[i] = bullet;
         }
     }
 
-    public GameObject GetPooledObject()
+    public Bullet GetPooledObject()
     {
-        for (int i = 0; i < pooledObjects.Count; i++)
+        for (int i = 0; i < _pooledObjects.Length; i++)
         {
-            if (!pooledObjects[i].activeInHierarchy)
+            if (!_pooledObjects[i].gameObject.activeInHierarchy)
             {
-                return pooledObjects[i];
+                return _pooledObjects[i];
             }
         }
 

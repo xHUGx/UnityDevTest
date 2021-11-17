@@ -12,21 +12,20 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Camera mainCamera;
     [SerializeField] private GameObject[] waypoints;
-    [SerializeField] public GameObject pistolMuzzle;
+    [SerializeField] private Transform pistolMuzzle;
+    [SerializeField] private TextMeshProUGUI moveText;
     private Rigidbody bulletRb;
     private Animator anim;
    
-    private int current;
+    private int currentWP;
     private float WPradius = 1;
     public float speed;
     private int stage;
-    [SerializeField] private TextMeshProUGUI moveText;
     
-
     private void Start()
     {
-        current = 1;
-        stage = 1;
+        currentWP = 1;
+        stage = 0;
         anim = GetComponentInChildren<Animator>();
     }
 
@@ -62,17 +61,15 @@ public class PlayerController : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 0);
                 break;
         }
-
-
     }
 
     private void Moving(int targetPoint)
     {
         anim.SetFloat("Speed", 1f);
-        if (Vector3.Distance(waypoints[current].transform.position, transform.position) < WPradius)
+        if (Vector3.Distance(waypoints[currentWP].transform.position, transform.position) < WPradius)
         {
-            current++;
-            if (current == targetPoint)
+            currentWP++;
+            if (currentWP == targetPoint)
             {
                 stage++;
             }
@@ -80,7 +77,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            transform.position = Vector3.MoveTowards(transform.position, waypoints[current].transform.position,
+            transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWP].transform.position,
                 Time.deltaTime * speed);
         }
     }
@@ -88,17 +85,14 @@ public class PlayerController : MonoBehaviour
     public void Shooting(int targetKills)
     {
         anim.SetFloat("Speed",0.5f);
-        GameObject pooledProjectile = BulletsPooler.SharedInstance.GetPooledObject();
-        Rigidbody bulletRb = pooledProjectile.GetComponent<Rigidbody>();
+        var pooledProjectile = BulletsPooler.SharedInstance.GetPooledObject();
        
         if (Input.GetButtonDown("Fire1") && (EnemyHealth.killed<targetKills))
         {
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (pooledProjectile != null)
             {
-                pooledProjectile.transform.position = pistolMuzzle.transform.position;
-                pooledProjectile.SetActive(true);
-                bulletRb.AddForce(ray.direction * 400f , ForceMode.Acceleration);
+                pooledProjectile.Shoot(ray.direction, pistolMuzzle.position);
             }
         }
         if (EnemyHealth.killed == targetKills)
