@@ -1,18 +1,17 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Vector3 = UnityEngine.Vector3;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Player")]
     [SerializeField] private Camera mainCamera;
+    [SerializeField] private Transform weaponSpace;
+    private Weapon _currentWeapon; 
+    [SerializeField] private Weapon[] weapons;
+    
     [SerializeField] private GameObject[] waypoints;
-    [SerializeField] private Transform pistolMuzzle;
     [SerializeField] private TextMeshProUGUI moveText;
     private Rigidbody bulletRb;
     private Animator anim;
@@ -27,6 +26,14 @@ public class PlayerController : MonoBehaviour
         currentWP = 1;
         stage = 0;
         anim = GetComponentInChildren<Animator>();
+
+        SpawnWeapon();
+    }
+
+    private void SpawnWeapon()
+    {
+        _currentWeapon = Instantiate(weapons[0], weaponSpace);
+        _currentWeapon.transform.localPosition = Vector3.zero;
     }
 
     private void Update()
@@ -85,15 +92,11 @@ public class PlayerController : MonoBehaviour
     public void Shooting(int targetKills)
     {
         anim.SetFloat("Speed",0.5f);
-        var pooledProjectile = BulletsPooler.SharedInstance.GetPooledObject();
-       
+        
         if (Input.GetButtonDown("Fire1") && (EnemyHealth.killed<targetKills))
         {
             var ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if (pooledProjectile != null)
-            {
-                pooledProjectile.Shoot(ray.direction, pistolMuzzle.position);
-            }
+            _currentWeapon.Shoot(ray.direction);
         }
         if (EnemyHealth.killed == targetKills)
         {

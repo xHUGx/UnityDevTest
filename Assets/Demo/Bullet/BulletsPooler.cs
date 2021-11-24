@@ -35,7 +35,7 @@ public class BulletsPooler : MonoBehaviour
                 return _pooledObjects[i];
             }
         }
-
+        
         return null;
     }
 }
