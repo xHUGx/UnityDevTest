@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenject;
 using Vector3 = UnityEngine.Vector3;
 
 public class PlayerController : MonoBehaviour
@@ -11,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private Weapon _currentWeapon; 
     [SerializeField] private Weapon[] weapons;
     
-    [SerializeField] private GameObject[] waypoints;
+    [Inject] private Transform[] _waypoints;
     [SerializeField] private TextMeshProUGUI moveText;
     private Rigidbody bulletRb;
     private Animator anim;
@@ -20,6 +21,15 @@ public class PlayerController : MonoBehaviour
     private float WPradius = 1;
     public float speed;
     private int stage;
+
+    private float _health;
+
+    [Inject]
+    private void Inject(Transform[] waypoints, PlayerConfig playerConfig)
+    {
+        _waypoints = waypoints;
+        _health = playerConfig.InitialHealth;
+    }
     
     private void Start()
     {
@@ -73,7 +83,7 @@ public class PlayerController : MonoBehaviour
     private void Moving(int targetPoint)
     {
         anim.SetFloat("Speed", 1f);
-        if (Vector3.Distance(waypoints[currentWP].transform.position, transform.position) < WPradius)
+        if (Vector3.Distance(_waypoints[currentWP].transform.position, transform.position) < WPradius)
         {
             currentWP++;
             if (currentWP == targetPoint)
@@ -84,7 +94,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWP].transform.position,
+            transform.position = Vector3.MoveTowards(transform.position, _waypoints[currentWP].transform.position,
                 Time.deltaTime * speed);
         }
     }
