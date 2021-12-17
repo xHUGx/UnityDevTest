@@ -2030,8 +2030,8 @@ MonoBehaviour:
   mainCamera: {fileID: 4186077398819318263}
   weaponSpace: {fileID: 2855790307813070034}
   weapons:
-  - {fileID: 1024141184006864735, guid: a4091f5a6a76e2345a51cbce047f03bf, type: 3}
   - {fileID: 1965951347404298439, guid: 87e8bf7f0e3d7b5438f215296939d18d, type: 3}
+  - {fileID: 1024141184006864735, guid: a4091f5a6a76e2345a51cbce047f03bf, type: 3}
   waypoints:
   - {fileID: 0}
   - {fileID: 0}
